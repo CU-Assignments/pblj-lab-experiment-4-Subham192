@@ -1,81 +1,86 @@
-Experiment 4.2: Card Collection System
+import java.util.*;
 
-Objective:
-Develop a Java program that collects and stores playing cards to help users find all the cards of a given symbol (suit).
-The program should utilize the Collection interface (such as ArrayList, HashSet, or HashMap) to manage the card data efficiently.
+class Card {
+    private String suit;
+    private String value;
 
-Understanding the Problem Statement
+    public Card(String suit, String value) {
+        this.suit = suit;
+        this.value = value;
+    }
 
-1. Card Structure:
-Each card consists of a symbol (suit) and a value (rank).
+    @Override
+    public String toString() {
+        return value + " of " + suit;
+    }
 
-Example card representations:
-Ace of Spades
-King of Hearts
-10 of Diamonds
-5 of Clubs
+    public String getSuit() {
+        return suit;
+    }
+}
 
-2. Operations Required:
-Add Cards → Store card details in a collection.
-Find Cards by Symbol (Suit) → Retrieve all cards belonging to a specific suit (e.g., all "Hearts").
-Display All Cards → Show all stored cards.
+public class CardCollectionSystem {
+    private List<Card> cardList;
+    private Map<String, List<Card>> cardMap;
 
-3. Collections Usage:
-ArrayList: To store cards in an ordered manner.
-HashSet: To prevent duplicate cards.
-HashMap<String, List<Card>>: To organize cards based on suits for faster lookup.
+    public CardCollectionSystem() {
+        cardList = new ArrayList<>();
+        cardMap = new HashMap<>();
+    }
 
+    public void addCard(String suit, String value) {
+        Card newCard = new Card(suit, value);
+        if (cardList.contains(newCard)) {
+            System.out.println("Error: Card \"" + newCard + "\" already exists.");
+            return;
+        }
+        cardList.add(newCard);
+        cardMap.computeIfAbsent(suit, k -> new ArrayList<>()).add(newCard);
+        System.out.println("Card added: " + newCard);
+    }
 
-Test Cases
+    public void findCardsBySuit(String suit) {
+        List<Card> cards = cardMap.get(suit);
+        if (cards == null || cards.isEmpty()) {
+            System.out.println("No cards found for " + suit + ".");
+        } else {
+            for (Card card : cards) {
+                System.out.println(card);
+            }
+        }
+    }
 
-Test Case 1: No Cards Initially
-Input:
-Display All Cards
-Expected Output:
-No cards found.
+    public void displayAllCards() {
+        if (cardList.isEmpty()) {
+            System.out.println("No cards found.");
+        } else {
+            for (Card card : cardList) {
+                System.out.println(card);
+            }
+        }
+    }
 
-Test Case 2: Adding Cards
-Input:
-Add Card: Ace of Spades
-Add Card: King of Hearts
-Add Card: 10 of Diamonds
-Add Card: 5 of Clubs
-Expected Output:
-Card added: Ace of Spades
-Card added: King of Hearts
-Card added: 10 of Diamonds
-Card added: 5 of Clubs
+    public void removeCard(String suit, String value) {
+        Card cardToRemove = new Card(suit, value);
+        if (cardList.remove(cardToRemove)) {
+            cardMap.get(suit).remove(cardToRemove);
+            System.out.println("Card removed: " + cardToRemove);
+        } else {
+            System.out.println("Error: Card \"" + cardToRemove + "\" not found.");
+        }
+    }
 
-Test Case 3: Finding Cards by Suit
-Input:
-Find All Cards of Suit: Hearts
-Expected Output:
-King of Hearts
-
-Test Case 4: Searching Suit with No Cards
-Input:
-Find All Cards of Suit: Diamonds
-(If no Diamonds were added)
-Expected Output:
-No cards found for Diamonds.
-
-Test Case 5: Displaying All Cards
-Input:
-Display All Cards
-Expected Output:
-Ace of Spades
-King of Hearts
-10 of Diamonds
-5 of Clubs
-
-Test Case 6: Preventing Duplicate Cards
-Input:
-Add Card: King of Hearts
-Expected Output:
-Error: Card "King of Hearts" already exists.
-
-Test Case 7: Removing a Card
-Input:
-Remove Card: 10 of Diamonds
-Expected Output:
-Card removed: 10 of Diamonds
+    public static void main(String[] args) {
+        CardCollectionSystem cardSystem = new CardCollectionSystem();
+        cardSystem.displayAllCards();
+        cardSystem.addCard("Spades", "Ace");
+        cardSystem.addCard("Hearts", "King");
+        cardSystem.addCard("Diamonds", "10");
+        cardSystem.addCard("Clubs", "5");
+        cardSystem.findCardsBySuit("Hearts");
+        cardSystem.findCardsBySuit("Diamonds");
+        cardSystem.displayAllCards();
+        cardSystem.addCard("Hearts", "King");
+        cardSystem.removeCard("Diamonds", "10");
+    }
+}
